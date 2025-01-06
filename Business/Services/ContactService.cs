@@ -53,7 +53,7 @@ public class ContactService : IContactService
     }
 
 
-    private void SaveContacts()
+    public void SaveContacts()
     {
         fileService.SaveContentToFile(contacts);
     }
