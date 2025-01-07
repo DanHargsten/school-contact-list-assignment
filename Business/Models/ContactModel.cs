@@ -14,7 +14,7 @@ public class ContactModel
 
     public string CompactContact()
     {
-        return $"{FirstName} {LastName}"; // ID: {Id}
+        return $"{FirstName} {LastName}"; 
     }
 
     public string DetailedContact()

@@ -1,6 +1,5 @@
 ﻿using Business.Models;
 using Business.Services;
-using System;
 
 namespace Presentation.ConsoleApp.Dialogs;
 
@@ -8,6 +7,9 @@ public class menuDialog
 {
     private readonly ContactService _contactService = new ContactService();
 
+    /// <summary>
+    /// Displays the main menu and handles user input for navigation.
+    /// </summary>
     public void ShowMenu()
     {
         bool isRunning = true;
@@ -50,7 +52,7 @@ public class menuDialog
                         break;
 
                     default:
-                        Console.WriteLine("fel?");
+                        Console.WriteLine("Invalid option. Please select a valid option from the menu.");
                         break;
                 }
             }
@@ -59,12 +61,16 @@ public class menuDialog
 
 
 
-    // Reducera upprepning av kod genom att skapa en hjälpmetod för användarens input.
+    /// <summary>
+    /// Prompts the user for input with a custom message and validates that it is not empty.
+    /// </summary>
+    /// <param name="prompt">The message displayed to the user.</param>
+    /// <returns>A validated, non-empty string.</returns>
     private string GetInput(string promt)
     {
         Console.Write(promt);
         string? input = Console.ReadLine();
-        while (string.IsNullOrWhiteSpace(promt))
+        while (string.IsNullOrWhiteSpace(input))
         {
             Console.WriteLine("Input can't be empty. Please try again.");
             Console.Write(promt);
@@ -75,7 +81,10 @@ public class menuDialog
 
 
 
-    // Väldigt simpel validering av email.
+    /// <summary>
+    /// Prompts the user for an email and validates that it is in a proper format.
+    /// </summary>
+    /// <returns>A validated email string.</returns>
     private string GetValidatedEmail()
     {
         string email = GetInput("Email: ");
@@ -89,8 +98,9 @@ public class menuDialog
 
 
 
-    // Visar initialt en kompakt lista som enbart inehåller för- och efternamn, samt ID.
-    // Användaren kan sen välja en kontakt via ett index för att se fullständing information.
+    /// <summary>
+    /// Displays a list of all contacts in compact format and allows the user to view details for a specific contact.
+    /// </summary>
     public void ShowAllContacts()
     {
         string? errorMessage = null;
@@ -108,7 +118,7 @@ public class menuDialog
             var contacts = _contactService.GetAllContacts();
             if (contacts.Count != 0)
             {
-                // Skriver ut en kompakt lista
+                // Skriver ut en kompakt lista i ett index.
                 for (int i = 0; i < contacts.Count; i++)
                 {
                     Console.WriteLine($"{i + 1}. {contacts[i].CompactContact()}");
@@ -143,9 +153,13 @@ public class menuDialog
             }         
         }
     }
-    
 
-    // Lägg till kontakt
+
+
+
+    /// <summary>
+    /// Prompts the user to enter details for a new contact and adds it to the contact list.
+    /// </summary>
     public void AddContact()
     {
         Console.Clear();
@@ -159,7 +173,7 @@ public class menuDialog
         string postalCode = GetInput("Postal Code: ");
         string city = GetInput("City: ");
 
-        
+
         var newContact = new ContactModel
         {
             FirstName = firstName,
@@ -180,7 +194,9 @@ public class menuDialog
 
 
 
-    // Uppdatera existerande kontakt
+    /// <summary>
+    /// Allows the user to update details for an existing contact.
+    /// </summary>
     public void UpdateContact()
     {
         var contacts = _contactService.GetAllContacts();
@@ -260,6 +276,9 @@ public class menuDialog
 
 
 
+    /// <summary>
+    /// Deletes a selected contact from the list after confirmation from the user.
+    /// </summary>
     public void DeleteContact()
     {
         var contacts = _contactService.GetAllContacts();
@@ -277,13 +296,14 @@ public class menuDialog
         Console.Write("\nEnter the number of the contact you want to delete, or press Enter to return: ");
         string input = Console.ReadLine()!;
 
-        if (string.IsNullOrEmpty(input) || !int.TryParse(input, out int index) || index > 1 || index > contacts.Count)
+        if (string.IsNullOrEmpty(input) || !int.TryParse(input, out int index) || index < 1 || index > contacts.Count)
         {
             OutputMessage("Invalid input. Returning to the menu.");
             return;
         }
 
         var contactToDelete = contacts[index - 1];
+
         Console.WriteLine($"\nAre you sure you want to delete this contact?");
         Console.WriteLine($"{contactToDelete.CompactContact()}");
         Console.Write($"\nEnter Y to confirm, or any other key to cancel: ");
@@ -307,20 +327,9 @@ public class menuDialog
 
     public void ExitApplication()
     {
-        Console.WriteLine("Are you sure you want to exit the application?");
-        Console.Write("\nEnter Y to confirm, or any other key to cancel: ");
-        string confirmation = Console.ReadLine()!;
-
-        if (confirmation.ToUpper() == "Y")
-        {
-            Environment.Exit(0);
-        }
-        else
-        {
-            return;
-        }
+        Console.WriteLine("Exiting application. Goodbye!");
+        Environment.Exit(0);
     }
-
 
 
 
