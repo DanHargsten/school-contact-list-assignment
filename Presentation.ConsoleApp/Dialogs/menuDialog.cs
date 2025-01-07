@@ -1,4 +1,7 @@
-﻿using Business.Models;
+﻿using Business.Dtos;
+using Business.Factories;
+using Business.Helpers;
+using Business.Models;
 using Business.Services;
 
 namespace Presentation.ConsoleApp.Dialogs;
@@ -17,7 +20,7 @@ public class menuDialog
         while (isRunning)
         {
             Console.Clear();
-            Console.WriteLine("======= CONTACT LIST =======");
+            Console.WriteLine("======= CONTACT LIST =======\n");
             Console.WriteLine("1. View All Contacts");
             Console.WriteLine("2. Add New Contact");
             Console.WriteLine("3. Update Existing Contact");
@@ -85,14 +88,17 @@ public class menuDialog
     /// Prompts the user for an email and validates that it is in a proper format.
     /// </summary>
     /// <returns>A validated email string.</returns>
-    private string GetValidatedEmail()
+    private string GetValidatedEmail(string prompt)
     {
-        string email = GetInput("Email: ");
-        while (!email.Contains("@") || !email.Contains("."))
+        Console.Write(prompt);
+        string email = Console.ReadLine()!;
+        while (!EmailHelper.IsValidEmail(email))
         {
-            Console.WriteLine("Invalid email format. Please try again");
-            email = GetInput("Email: ");
+            Console.WriteLine("Invalid email format. Please try again.");
+            Console.Write(prompt);
+            email = Console.ReadLine()!;
         }
+
         return email;
     }
 
@@ -108,6 +114,8 @@ public class menuDialog
         while (true)
         {
             Console.Clear();
+            Console.WriteLine("======= VIEW ALL CONTACTS =======\n");
+
 
             if (!string.IsNullOrWhiteSpace(errorMessage))
             {
@@ -118,24 +126,26 @@ public class menuDialog
             var contacts = _contactService.GetAllContacts();
             if (contacts.Count != 0)
             {
-                // Skriver ut en kompakt lista i ett index.
+                // Visa alla kontakter i en kompakt lista
                 for (int i = 0; i < contacts.Count; i++)
                 {
-                    Console.WriteLine($"{i + 1}. {contacts[i].CompactContact()}");
+                    Console.WriteLine($" {i + 1}. {contacts[i].CompactContact()}");
                 }
 
-                Console.Write("\nEnter the number of a contact to view details, or press Enter to return: ");
+                Console.WriteLine("\n 0. Return to main menu");
+                Console.Write("\nEnter the number of a contact to view details, or 0 to return to main menu: ");
                 string input = Console.ReadLine()!;
 
-                if (string.IsNullOrWhiteSpace(input))
-                {
-                    return;
-                }
+                if (input == "0") return;
 
-                // Skriver ut detaljerad lista
+                if (string.IsNullOrWhiteSpace(input)) return;
+                
+
+                // Skriver ut detaljerad information för vald kontakt
                 if (int.TryParse(input, out int index) && index > 0 && index <= contacts.Count)
                 {
                     Console.Clear();
+                    Console.WriteLine("======= CONTACT DETAILS =======\n");
                     Console.WriteLine(contacts[index - 1].DetailedContact());
                     Console.WriteLine("\nPress any key to return to the contact list.");
                     Console.ReadKey();
@@ -148,7 +158,8 @@ public class menuDialog
             }
             else
             {
-                OutputMessage("No existing contacts");
+                OutputMessage("No existing contacts. Press any key to return to the main menu.");
+                Console.ReadKey();
                 return;
             }         
         }
@@ -163,32 +174,27 @@ public class menuDialog
     public void AddContact()
     {
         Console.Clear();
+        Console.WriteLine("======= ADD CONTACT =======\n");
         Console.WriteLine("Please enter contact information.");
 
-        string firstName = GetInput("First Name: ");
-        string lastName = GetInput("Last Name: ");
-        string email = GetValidatedEmail();
-        string phone = GetInput("Phone number: ");
-        string address = GetInput("Address: ");
-        string postalCode = GetInput("Postal Code: ");
-        string city = GetInput("City: ");
-
-
-        var newContact = new ContactModel
+        var contactForm = new ContactRegistrationForm
         {
-            FirstName = firstName,
-            LastName = lastName,
-            Email = email,
-            Phone = phone,
-            Address = address,
-            PostalCode = postalCode,
-            City = city
+            FirstName = GetInput("First Name: "),
+            LastName = GetInput("Last Name: "),
+            Email = GetValidatedEmail("Email: "),
+            Phone = GetInput("Phone number: "),
+            Address = GetInput("Address: "),
+            PostalCode = GetInput("Postal Code: "),
+            City = GetInput("City: ")
         };
 
-        _contactService.AddContact(newContact);
+
+        var newContact = ContactFactory.Create(contactForm);
+        _contactService.AddContact(contactForm);
+
         Console.Clear();
-        Console.WriteLine($"Contact added successfully!\n{newContact.CompactContact()}");
-        Console.WriteLine("\nPress any key to continue.");
+        Console.WriteLine($"Contact {newContact.CompactContact()} added successfully!");
+        Console.WriteLine("\nPress any key to return to the main menu.");
         Console.ReadKey();
     }
 
@@ -202,18 +208,22 @@ public class menuDialog
         var contacts = _contactService.GetAllContacts();
         if (contacts.Count == 0)
         {
-            OutputMessage("No existing contacts to update.");
+            OutputMessage("No existing contacts to update. Press any key to return to the main menu.");
+            Console.ReadKey();
             return;
         }
 
         Console.Clear();
+        Console.WriteLine("======= UPDATE CONTACTS =======\n");
         for (int i = 0; i < contacts.Count; i++)
         {
             Console.WriteLine($"{i + 1}. {contacts[i].CompactContact()}");
         }
 
-        Console.Write("\nEnter the number of the contact you want to update, or press Enter to return: ");
+        Console.Write("\nEnter the number of the contact you want to update, or 0 to cancel: ");
         string input = Console.ReadLine()!;
+
+        if (input == "0") return;
 
         if (string.IsNullOrWhiteSpace(input) || !int.TryParse(input, out int index) || index < 1 || index > contacts.Count)
         {
@@ -222,55 +232,76 @@ public class menuDialog
         }
 
         var contactToUpdate = contacts[index - 1];
-        Console.Clear();
-        Console.WriteLine($"Updating contact: {contactToUpdate.CompactContact()}");
-        Console.WriteLine("1. First Name");
-        Console.WriteLine("2. Last Name");
-        Console.WriteLine("3. Email");
-        Console.WriteLine("4. Phone");
-        Console.WriteLine("5. Address");
-        Console.WriteLine("6. Postal Code");
-        Console.WriteLine("7. City");
+        var maskedEmail = EmailHelper.MaskEmail(contactToUpdate.Email);
 
-
-        string fieldChoice = Console.ReadLine()!;
-        switch (fieldChoice)
+        while (true)
         {
-            case "1":
-                contactToUpdate.FirstName = GetInput("Enter new First Name: ");
-                break;
-            
-            case "2":
-                contactToUpdate.LastName = GetInput("Enter new Last Name: ");
-                break;
+            Console.Clear();
+            Console.WriteLine($"=========================================");
+            Console.WriteLine($" Updating contact: {contactToUpdate.CompactContact()}");
+            Console.WriteLine($"=========================================");
+            Console.WriteLine($" Choose the field to update:");
+            Console.WriteLine($" 1. First Name  ({contactToUpdate.FirstName})");
+            Console.WriteLine($" 2. Last Name   ({contactToUpdate.LastName})");
+            Console.WriteLine($" 3. Email       ({maskedEmail})");
+            Console.WriteLine($" 4. Phone       ({contactToUpdate.Phone})");
+            Console.WriteLine($" 5. Address     ({contactToUpdate.Address})");
+            Console.WriteLine($" 6. Postal Code ({contactToUpdate.PostalCode})");
+            Console.WriteLine($" 7. City        ({contactToUpdate.City})");
+            Console.WriteLine();
+            Console.WriteLine($" 0. Cancel");
 
-            case "3":
-                contactToUpdate.Email = GetValidatedEmail();
-                break;
 
-            case "4":
-                contactToUpdate.Phone = GetInput("Enter new Phone Number:");
-                break;
+            Console.Write("\nEnter the number of the field you want to update: ");
+            string fieldChoice = Console.ReadLine()!;
 
-            case "5":
-                contactToUpdate.Address = GetInput("Enter new Address: ");
-                break;
+            switch (fieldChoice)
+            {
+                case "1":
+                    contactToUpdate.FirstName = GetInput("Enter new First Name: ");
+                    break;
 
-            case "6":
-                contactToUpdate.PostalCode = GetInput("Enter new Postal Code: ");
-                break;
+                case "2":
+                    contactToUpdate.LastName = GetInput("Enter new Last Name: ");
+                    break;
 
-            case "7":
-                contactToUpdate.City = GetInput("Enter new City: ");
-                break;
+                case "3":
+                    contactToUpdate.Email = GetValidatedEmail("Enter new Email: ");
+                    break;
 
-            default:
-                OutputMessage("Invalid field choise. Returning to the menu.");
-                return;
+                case "4":
+                    contactToUpdate.Phone = GetInput("Enter new Phone Number: ");
+                    break;
+
+                case "5":
+                    contactToUpdate.Address = GetInput("Enter new Address: ");
+                    break;
+
+                case "6":
+                    contactToUpdate.PostalCode = GetInput("Enter new Postal Code: ");
+                    break;
+
+                case "7":
+                    contactToUpdate.City = GetInput("Enter new City: ");
+                    break;
+
+                case "0":
+                    OutputMessage("Update canceled. Press any key to return to the main menu.");
+                    Console.ReadKey();
+                    return;
+
+                default:
+                    OutputMessage("Invalid field choice. Please try again.");
+                    Console.ReadKey();
+                    continue;
+            }
+
+            _contactService.SaveContacts();
+            OutputMessage("Contact updated successfully.\nPress any key to return to the main menu.");
+            Console.ReadKey();
+            return;
         }
 
-        _contactService.SaveContacts();
-        OutputMessage("Contact updated successfully.");
 
     }
 
@@ -288,13 +319,17 @@ public class menuDialog
         }
 
         Console.Clear();
+        Console.WriteLine("======= DELETE CONTACT =======\n");
         for (int i = 0; i < contacts.Count; i++)
         {
-            Console.WriteLine($"{i + 1}. {contacts[i].CompactContact()}");
+            Console.WriteLine($" {i + 1}. {contacts[i].CompactContact()}");
         }
 
-        Console.Write("\nEnter the number of the contact you want to delete, or press Enter to return: ");
+        Console.WriteLine("\n 0. Return to main menu");
+        Console.Write("\nEnter the number of the contact you want to delete, or 0 to cancel: ");
         string input = Console.ReadLine()!;
+
+        if (input == "0") return;
 
         if (string.IsNullOrEmpty(input) || !int.TryParse(input, out int index) || index < 1 || index > contacts.Count)
         {
@@ -313,11 +348,11 @@ public class menuDialog
         {
             _contactService.DeleteContact(index - 1);
             _contactService.SaveContacts();
-            OutputMessage("Contact deleted successfully.");
+            OutputMessage("Contact deleted successfully.\nPress any key to return to the main menu.");
         }
         else
         {
-            OutputMessage("Deletion canceled.");
+            OutputMessage("Deletion canceled.\nPress any key to return to the main menu.");
         }
     }
 
@@ -327,7 +362,8 @@ public class menuDialog
 
     public void ExitApplication()
     {
-        Console.WriteLine("Exiting application. Goodbye!");
+        Console.Clear();
+        Console.WriteLine("\nExiting application. Goodbye!");
         Environment.Exit(0);
     }
 

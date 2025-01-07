@@ -3,6 +3,9 @@ using System.Text.Json;
 
 namespace Business.Services;
 
+/// <summary>
+/// A service for saving and loading contact data to and from a file.
+/// </summary>
 public class FileService
 {
     private readonly string _directoryPath;
@@ -15,7 +18,11 @@ public class FileService
     }
 
 
-    // Save to file
+
+    /// <summary>
+    /// Saves a list of contacts to a file in JSON format.
+    /// </summary>
+    /// <param name="contacts">The list of contacts to save.</param>
     public void SaveContentToFile(List<ContactModel> contacts)
     {
         try
@@ -40,7 +47,10 @@ public class FileService
 
 
 
-    // Load data from file
+    /// <summary>
+    /// Loads a list of contacts from a file in JSON format.
+    /// </summary>
+    /// <returns>A list of contacts, or null if the file does not exist or is invalid.</returns>
     public List<ContactModel>? GetContentFromFile()
     {
         try
