@@ -12,8 +12,16 @@ public static class EmailHelper
     /// <returns>True if the email address is valid, false otherwise.</returns>
     public static bool IsValidEmail(string email)
     {
-        return email.Contains("@") && email.Contains(".");
+        if (string.IsNullOrWhiteSpace(email)) return false;
+
+        var atIndex = email.IndexOf('@');
+        var dotIndex = email.LastIndexOf('.');
+
+        // Kontrollera om "@" finns och inte är det första tecknet, och "." finns efter "@"
+        return atIndex > 0 && dotIndex > atIndex + 1 && dotIndex < email.Length - 1;
     }
+
+
 
 
 
@@ -25,7 +33,8 @@ public static class EmailHelper
     //
     // Metoden visar endast den första bokstaven i e-postadressen och behåller hela domänen.
     // Exempel:
-    //   dan@domain.se --> d****@domain.se
+    //   test@domain.se --> t****@domain.se
+
 
     /// <summary>
     /// Masks an email address to hide part of it for display purposes.
@@ -35,7 +44,7 @@ public static class EmailHelper
     public static string MaskEmail(string email)
     {
         var atIndex = email.IndexOf('@');
-        if (atIndex <= 1) return email;
+        if (atIndex <= 0) return email;
 
         var visiblePart = email.Substring(0, 1);
         var domain = email.Substring(atIndex); 

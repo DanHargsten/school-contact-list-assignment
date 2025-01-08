@@ -193,7 +193,7 @@ public class menuDialog
         _contactService.AddContact(contactForm);
 
         Console.Clear();
-        Console.WriteLine($"Contact {newContact.CompactContact()} added successfully!");
+        Console.WriteLine($"{newContact.CompactContact()} added successfully!");
         Console.WriteLine("\nPress any key to return to the main menu.");
         Console.ReadKey();
     }
@@ -315,7 +315,9 @@ public class menuDialog
         var contacts = _contactService.GetAllContacts();
         if (contacts.Count == 0)
         {
-            OutputMessage("No existing contacts to delete.");
+            OutputMessage("No existing contacts to delete.\nPress any key to return to the main menu.");
+            Console.ReadKey();
+            return;
         }
 
         Console.Clear();
@@ -339,7 +341,8 @@ public class menuDialog
 
         var contactToDelete = contacts[index - 1];
 
-        Console.WriteLine($"\nAre you sure you want to delete this contact?");
+        Console.Clear();
+        Console.WriteLine($"Are you sure you want to delete this contact?");
         Console.WriteLine($"{contactToDelete.CompactContact()}");
         Console.Write($"\nEnter Y to confirm, or any other key to cancel: ");
         string confirmation = Console.ReadLine()!;
