@@ -1,4 +1,5 @@
-﻿using Business.Models;
+﻿using Business.Interfaces;
+using Business.Models;
 using System.Text.Json;
 
 namespace Business.Services;
@@ -6,7 +7,7 @@ namespace Business.Services;
 /// <summary>
 /// A service for saving and loading contact data to and from a file.
 /// </summary>
-public class FileService
+public class FileService : IFileService
 {
     private readonly string _directoryPath;
     private readonly string _filePath;

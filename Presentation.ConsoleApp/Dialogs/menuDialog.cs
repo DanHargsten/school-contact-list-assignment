@@ -1,14 +1,21 @@
 ﻿using Business.Dtos;
 using Business.Factories;
 using Business.Helpers;
+using Business.Interfaces;
 using Business.Models;
 using Business.Services;
 
 namespace Presentation.ConsoleApp.Dialogs;
 
-public class menuDialog
+public class MenuDialog
 {
-    private readonly ContactService _contactService = new ContactService();
+    //private readonly ContactService _contactService = new ContactService(new FileService());
+    private readonly IContactService _contactService;
+
+    public MenuDialog(IContactService contactService)
+    {
+        _contactService = contactService;
+    }
 
     /// <summary>
     /// Displays the main menu and handles user input for navigation.

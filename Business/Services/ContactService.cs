@@ -10,18 +10,18 @@ namespace Business.Services;
 /// </summary>
 public class ContactService : IContactService
 {
-    private readonly List<ContactModel> contacts = new();
-    private readonly FileService fileService;
+    private readonly IFileService _fileService;
+    private readonly List<ContactModel> _contacts;
 
 
     /// <summary>
     /// Initializes a new instance of <see cref="ContactService"/>.
     /// Loads existing contacts from file if available.
     /// </summary>
-    public ContactService()
+    public ContactService(IFileService fileService)
     {
-        fileService = new FileService();
-        contacts = fileService.GetContentFromFile() ?? new List<ContactModel>();
+        _fileService = fileService;
+        _contacts = _fileService.GetContentFromFile() ?? new List<ContactModel>();
     }
 
 
@@ -29,22 +29,22 @@ public class ContactService : IContactService
     public void AddContact(ContactRegistrationForm form)
     {
         var contact = ContactFactory.Create(form);
-        contacts.Add(contact);
+        _contacts.Add(contact);
         SaveContacts();
     }
 
 
 
-    public List<ContactModel> GetAllContacts() => contacts;
+    public List<ContactModel> GetAllContacts() => _contacts;
     
 
 
     public bool UpdateContact(int index, ContactRegistrationForm form)
     {
-        if (index >= 0 && index < contacts.Count)
+        if (index >= 0 && index < _contacts.Count)
         {
             var updatedContact = ContactFactory.Create(form);
-            contacts[index] = updatedContact;
+            _contacts[index] = updatedContact;
             SaveContacts();
             return true;
         }
@@ -55,9 +55,9 @@ public class ContactService : IContactService
 
     public bool DeleteContact(int index)
     {
-        if (index >= 0 && index <= contacts.Count)
+        if (index >= 0 && index <= _contacts.Count)
         {
-            contacts.RemoveAt(index);
+            _contacts.RemoveAt(index);
             SaveContacts();
             return true;
         }
@@ -66,5 +66,5 @@ public class ContactService : IContactService
 
 
 
-    public void SaveContacts() => fileService.SaveContentToFile(contacts);
+    public void SaveContacts() => _fileService.SaveContentToFile(_contacts);
 }

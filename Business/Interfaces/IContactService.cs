@@ -38,4 +38,6 @@ public interface IContactService
     /// <param name="index">The index of the contact to delete.</param>
     /// <returns>True if the contact was successfully deleted, false otherwise.</returns>
     bool DeleteContact(int index);
+
+    void SaveContacts();
 }
