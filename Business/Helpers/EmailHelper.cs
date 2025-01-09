@@ -6,7 +6,7 @@
 public static class EmailHelper
 {
     /// <summary>
-    /// Checks if an email address is in a valid format.
+    /// Validated if an email address is in the correct format.
     /// </summary>
     /// <param name="email">The email address to validate.</param>
     /// <returns>True if the email address is valid, false otherwise.</returns>
@@ -17,7 +17,6 @@ public static class EmailHelper
         var atIndex = email.IndexOf('@');
         var dotIndex = email.LastIndexOf('.');
 
-        // Kontrollera om "@" finns och inte är det första tecknet, och "." finns efter "@"
         return atIndex > 0 && dotIndex > atIndex + 1 && dotIndex < email.Length - 1;
     }
 
@@ -40,14 +39,12 @@ public static class EmailHelper
     /// Masks an email address to hide part of it for display purposes.
     /// </summary>
     /// <param name="email">The email address to mask.</param>
-    /// <returns>A masked email address.</returns>
+    /// <returns>A masked email address where the domain remains visible.</returns>
     public static string MaskEmail(string email)
     {
         var atIndex = email.IndexOf('@');
-        if (atIndex <= 0) return email;
-
-        var visiblePart = email.Substring(0, 1);
-        var domain = email.Substring(atIndex); 
-        return $"{visiblePart}****{domain}";
+        return atIndex > 0
+            ? $"{email[0]}****{email.Substring(atIndex)}"
+            : email;
     }
 }

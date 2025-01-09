@@ -6,7 +6,7 @@ using Business.Models;
 namespace Business.Services;
 
 /// <summary>
-/// A service for managing contacts, including CRUD operations.
+/// Provides services to manage contacts, including adding, retrieving, updating, and deleting contacts.
 /// </summary>
 public class ContactService : IContactService
 {
@@ -16,8 +16,8 @@ public class ContactService : IContactService
 
     /// <summary>
     /// Initializes a new instance of <see cref="ContactService"/>.
-    /// Loads existing contacts from file if available.
     /// </summary>
+    /// <param name="fileService">The file service used to save and load contacts</param>
     public ContactService(IFileService fileService)
     {
         _fileService = fileService;
@@ -26,6 +26,7 @@ public class ContactService : IContactService
 
 
 
+    /// <inheritdoc/>
     public void AddContact(ContactRegistrationForm form)
     {
         var contact = ContactFactory.Create(form);
@@ -35,16 +36,29 @@ public class ContactService : IContactService
 
 
 
+    /// <inheritdoc/>
     public List<ContactModel> GetAllContacts() => _contacts;
-    
 
 
+
+    /// <inheritdoc/>
     public bool UpdateContact(int index, ContactRegistrationForm form)
     {
         if (index >= 0 && index < _contacts.Count)
         {
-            var updatedContact = ContactFactory.Create(form);
-            _contacts[index] = updatedContact;
+            //var updatedContact = ContactFactory.Create(form);
+            //_contacts[index] = updatedContact;
+            //SaveContacts();
+            //return true;
+
+            _contacts[index].FirstName = form.FirstName;
+            _contacts[index].LastName = form.LastName;
+            _contacts[index].Email = form.Email;
+            _contacts[index].Phone = form.Phone;
+            _contacts[index].Address = form.Address;
+            _contacts[index].PostalCode = form.PostalCode;
+            _contacts[index].City = form.City;
+
             SaveContacts();
             return true;
         }
@@ -53,9 +67,10 @@ public class ContactService : IContactService
 
 
 
+    /// <inheritdoc/>
     public bool DeleteContact(int index)
     {
-        if (index >= 0 && index <= _contacts.Count)
+        if (index >= 0 && index < _contacts.Count)
         {
             _contacts.RemoveAt(index);
             SaveContacts();
@@ -66,5 +81,8 @@ public class ContactService : IContactService
 
 
 
+    /// <summary>
+    /// Saves the list of contacts to a file.
+    /// </summary>
     public void SaveContacts() => _fileService.SaveContentToFile(_contacts);
 }

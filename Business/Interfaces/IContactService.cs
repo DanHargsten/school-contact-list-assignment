@@ -12,19 +12,19 @@ public interface IContactService
     /// <summary>
     /// Adds a new contact based on the provided registration form.
     /// </summary>
-    /// <param name="form">The contact registration form with user input.</param>
+    /// <param name="form">The registration form containing contact details.</param>
     void AddContact(ContactRegistrationForm form);
 
 
     /// <summary>
     /// Retrieves all contacts.
     /// </summary>
-    /// <returns>A list of all stored contacts.</returns>
+    /// <returns>A list of all contacts.</returns>
     List<ContactModel> GetAllContacts();
 
 
     /// <summary>
-    /// Updates an existing contact at the given index with new details.
+    /// Updates an existing contact based on the specified index.
     /// </summary>
     /// <param name="index">The index of the contact to update.</param>
     /// <param name="form">The updated contact details.</param>
@@ -33,7 +33,7 @@ public interface IContactService
 
 
     /// <summary>
-    /// Deletes a contact at the specified index.
+    /// Deletes a contact based on the specified index.
     /// </summary>
     /// <param name="index">The index of the contact to delete.</param>
     /// <returns>True if the contact was successfully deleted, false otherwise.</returns>

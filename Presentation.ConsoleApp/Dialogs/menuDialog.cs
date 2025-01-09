@@ -2,14 +2,11 @@
 using Business.Factories;
 using Business.Helpers;
 using Business.Interfaces;
-using Business.Models;
-using Business.Services;
 
 namespace Presentation.ConsoleApp.Dialogs;
 
 public class MenuDialog
 {
-    //private readonly ContactService _contactService = new ContactService(new FileService());
     private readonly IContactService _contactService;
 
     public MenuDialog(IContactService contactService)
@@ -234,7 +231,8 @@ public class MenuDialog
 
         if (string.IsNullOrWhiteSpace(input) || !int.TryParse(input, out int index) || index < 1 || index > contacts.Count)
         {
-            OutputMessage("Invalid input. Returning to the menu.");
+            OutputMessage("Invalid input. Press any key to return to the main menu.");
+            Console.ReadKey();
             return;
         }
 

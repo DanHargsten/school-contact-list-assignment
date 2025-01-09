@@ -1,11 +1,11 @@
 ﻿namespace Business.Models;
 
 /// <summary>
-/// Represents a contact with detailed information.
+/// Represents a contact with personal and address information.
 /// </summary>
 public class ContactModel
 {
-    public string Id { get; set; } = null!;
+    public string Id { get; init; } = null!;
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
     public string Email { get; set; } = null!;
@@ -17,8 +17,9 @@ public class ContactModel
 
 
     /// <summary>
-    /// Returns a compact representation of the contact, containing only the first and last name.
+    /// Returns a compact representation of the contact.
     /// </summary>
+    /// <returns>A string with the contac'ts first and last name.</returns>
     public string CompactContact()
     {
         return $"{FirstName} {LastName}"; 
@@ -26,8 +27,9 @@ public class ContactModel
 
 
     /// <summary>
-    /// Returns a detailed representation of the contact with all fields.
+    /// Returns a detailed representation of the contact.
     /// </summary>
+    /// <returns>A detailed multi-line string with the contact's full information.</returns>
     public string DetailedContact()
     {
         return $@"

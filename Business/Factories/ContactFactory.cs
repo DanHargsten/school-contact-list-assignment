@@ -10,16 +10,17 @@ namespace Business.Factories;
 public class ContactFactory
 {
     /// <summary>
-    /// Creates an empty instance of <see cref="ContactRegistrationForm"/>.
+    /// Creates a new instance of <see cref="ContactRegistrationForm"/>.
     /// </summary>
+    /// <returns>A new instance of <see cref="ContactRegistrationForm"/></returns>
     public static ContactRegistrationForm Create() => new();
 
 
     /// <summary>
-    /// Creates a <see cref="ContactModel"/> from a given <see cref="ContactRegistrationForm"/>.
+    /// Creates a new instance of <see cref="ContactModel"/> based on the provided registration form.
     /// </summary>
-    /// <param name="form">The input form containing contact details.</param>
-    /// <returns>A new instance of <see cref="ContactModel"/>.</returns>
+    /// <param name="form">The contact registration form containing user-provided details.</param>
+    /// <returns>A new instance of <see cref="ContactModel"/> populated with data from the registration form.</returns>
     public static ContactModel Create(ContactRegistrationForm form) => new()
     {
         Id = IdGenerator.Generate(),

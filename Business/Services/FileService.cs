@@ -5,13 +5,18 @@ using System.Text.Json;
 namespace Business.Services;
 
 /// <summary>
-/// A service for saving and loading contact data to and from a file.
+/// Provides functionality to save and load contact data to and from a file.
 /// </summary>
 public class FileService : IFileService
 {
     private readonly string _directoryPath;
     private readonly string _filePath;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FileService"/> class.
+    /// </summary>
+    /// <param name="directoryPath">The directory where the file is stored</param>
+    /// <param name="fileName">The name of the file</param>
     public FileService(string directoryPath = "Data", string fileName = "contactlist.json")
     {
         _directoryPath = directoryPath;
