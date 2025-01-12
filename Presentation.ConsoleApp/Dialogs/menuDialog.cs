@@ -59,7 +59,10 @@ public class MenuDialog
                         break;
 
                     default:
+                        Console.Clear();
                         Console.WriteLine("Invalid option. Please select a valid option from the menu.");
+                        Console.WriteLine("Press any key to try again.");
+                        Console.ReadKey();
                         break;
                 }
             }
@@ -173,7 +176,7 @@ public class MenuDialog
 
 
     /// <summary>
-    /// Prompts the user to enter details for a new contact and adds it to the contact list.
+    /// Adds a new contact based on user input.
     /// </summary>
     public void AddContact()
     {
@@ -217,97 +220,98 @@ public class MenuDialog
             return;
         }
 
-        Console.Clear();
-        Console.WriteLine("======= UPDATE CONTACTS =======\n");
-        for (int i = 0; i < contacts.Count; i++)
-        {
-            Console.WriteLine($"{i + 1}. {contacts[i].CompactContact()}");
-        }
-
-        Console.Write("\nEnter the number of the contact you want to update, or 0 to cancel: ");
-        string input = Console.ReadLine()!;
-
-        if (input == "0") return;
-
-        if (string.IsNullOrWhiteSpace(input) || !int.TryParse(input, out int index) || index < 1 || index > contacts.Count)
-        {
-            OutputMessage("Invalid input. Press any key to return to the main menu.");
-            Console.ReadKey();
-            return;
-        }
-
-        var contactToUpdate = contacts[index - 1];
-        var maskedEmail = EmailHelper.MaskEmail(contactToUpdate.Email);
-
         while (true)
         {
             Console.Clear();
-            Console.WriteLine($"=========================================");
-            Console.WriteLine($" Updating contact: {contactToUpdate.CompactContact()}");
-            Console.WriteLine($"=========================================");
-            Console.WriteLine($" Choose the field to update:");
-            Console.WriteLine($" 1. First Name  ({contactToUpdate.FirstName})");
-            Console.WriteLine($" 2. Last Name   ({contactToUpdate.LastName})");
-            Console.WriteLine($" 3. Email       ({maskedEmail})");
-            Console.WriteLine($" 4. Phone       ({contactToUpdate.Phone})");
-            Console.WriteLine($" 5. Address     ({contactToUpdate.Address})");
-            Console.WriteLine($" 6. Postal Code ({contactToUpdate.PostalCode})");
-            Console.WriteLine($" 7. City        ({contactToUpdate.City})");
-            Console.WriteLine();
-            Console.WriteLine($" 0. Cancel");
-
-
-            Console.Write("\nEnter the number of the field you want to update: ");
-            string fieldChoice = Console.ReadLine()!;
-
-            switch (fieldChoice)
+            Console.WriteLine("======= UPDATE CONTACTS =======\n");
+            for (int i = 0; i < contacts.Count; i++)
             {
-                case "1":
-                    contactToUpdate.FirstName = GetInput("Enter new First Name: ");
-                    break;
-
-                case "2":
-                    contactToUpdate.LastName = GetInput("Enter new Last Name: ");
-                    break;
-
-                case "3":
-                    contactToUpdate.Email = GetValidatedEmail("Enter new Email: ");
-                    break;
-
-                case "4":
-                    contactToUpdate.Phone = GetInput("Enter new Phone Number: ");
-                    break;
-
-                case "5":
-                    contactToUpdate.Address = GetInput("Enter new Address: ");
-                    break;
-
-                case "6":
-                    contactToUpdate.PostalCode = GetInput("Enter new Postal Code: ");
-                    break;
-
-                case "7":
-                    contactToUpdate.City = GetInput("Enter new City: ");
-                    break;
-
-                case "0":
-                    OutputMessage("Update canceled. Press any key to return to the main menu.");
-                    Console.ReadKey();
-                    return;
-
-                default:
-                    OutputMessage("Invalid field choice. Please try again.");
-                    Console.ReadKey();
-                    continue;
+                Console.WriteLine($"{i + 1}. {contacts[i].CompactContact()}");
             }
 
-            _contactService.SaveContacts();
-            OutputMessage("Contact updated successfully.\nPress any key to return to the main menu.");
-            Console.ReadKey();
-            return;
+            Console.Write("\nEnter the number of the contact you want to update, or 0 to cancel: ");
+            string input = Console.ReadLine()!;
+
+            if (input == "0") return;
+
+            if (string.IsNullOrWhiteSpace(input) || !int.TryParse(input, out int index) || index < 1 || index > contacts.Count)
+            {
+                OutputMessage("Invalid input. Press any key to return to try again.");
+                Console.ReadKey();
+                continue;
+            }
+
+            var contactToUpdate = contacts[index - 1];
+            var maskedEmail = EmailHelper.MaskEmail(contactToUpdate.Email);
+
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine($"=========================================");
+                Console.WriteLine($" Updating contact: {contactToUpdate.CompactContact()}");
+                Console.WriteLine($"=========================================");
+                Console.WriteLine($" Choose the field to update:");
+                Console.WriteLine($" 1. First Name  ({contactToUpdate.FirstName})");
+                Console.WriteLine($" 2. Last Name   ({contactToUpdate.LastName})");
+                Console.WriteLine($" 3. Email       ({maskedEmail})");
+                Console.WriteLine($" 4. Phone       ({contactToUpdate.Phone})");
+                Console.WriteLine($" 5. Address     ({contactToUpdate.Address})");
+                Console.WriteLine($" 6. Postal Code ({contactToUpdate.PostalCode})");
+                Console.WriteLine($" 7. City        ({contactToUpdate.City})");
+                Console.WriteLine();
+                Console.WriteLine($" 0. Cancel");
+
+
+                Console.Write("\nEnter the number of the field you want to update: ");
+                string fieldChoice = Console.ReadLine()!;
+
+                switch (fieldChoice)
+                {
+                    case "1":
+                        contactToUpdate.FirstName = GetInput("Enter new First Name: ");
+                        break;
+
+                    case "2":
+                        contactToUpdate.LastName = GetInput("Enter new Last Name: ");
+                        break;
+
+                    case "3":
+                        contactToUpdate.Email = GetValidatedEmail("Enter new Email: ");
+                        break;
+
+                    case "4":
+                        contactToUpdate.Phone = GetInput("Enter new Phone Number: ");
+                        break;
+
+                    case "5":
+                        contactToUpdate.Address = GetInput("Enter new Address: ");
+                        break;
+
+                    case "6":
+                        contactToUpdate.PostalCode = GetInput("Enter new Postal Code: ");
+                        break;
+
+                    case "7":
+                        contactToUpdate.City = GetInput("Enter new City: ");
+                        break;
+
+                    case "0":
+                        OutputMessage("Update canceled. Press any key to return to the main menu.");
+                        Console.ReadKey();
+                        return;
+
+                    default:
+                        OutputMessage("Invalid field choice. Please try again.");
+                        Console.ReadKey();
+                        continue;
+                }
+
+                _contactService.SaveContacts();
+                OutputMessage("Contact updated successfully.\nPress any key to return to the main menu.");
+                Console.ReadKey();
+                return;
+            }
         }
-
-
     }
 
 
@@ -361,6 +365,7 @@ public class MenuDialog
         else
         {
             OutputMessage("Deletion canceled.\nPress any key to return to the main menu.");
+            Console.ReadKey();
         }
     }
 
@@ -371,8 +376,13 @@ public class MenuDialog
     public void ExitApplication()
     {
         Console.Clear();
-        Console.WriteLine("\nExiting application. Goodbye!");
-        Environment.Exit(0);
+        Console.Write("Are you sure you want to exit?\nEnter Y to confirm, or any other key to cancel: ");
+        if (Console.ReadLine()!.ToUpper() == "Y")
+        {
+            Console.Clear();
+            Console.WriteLine("Exiting application. Goodbye!");
+            Environment.Exit(0);
+        }
     }
 
 
